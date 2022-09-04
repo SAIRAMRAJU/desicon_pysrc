@@ -24,6 +24,7 @@ data = [
 
 layout = [[sg.Text('President Name : '),sg.Input(key='-president-')],
           [sg.Text('Date of Birth  : '),sg.Input(key='-dob-')], 
+          [sg.Button('Add',key='-addclick-'), sg.Cancel(key='-cancelclick-')],
           [sg.Table(data, headings=headings, 
            justification='left', 
            max_col_width=25,
@@ -38,7 +39,13 @@ while True:
     if event == sg.WINDOW_CLOSED:
         break
     print(event, values)
-    president_list[0] = values["-president-"]
-    president_list[1] = values["-dob-"]
+    sg.Print(event)
+    if event == "-cancelclick-":
+        break
+    if event == "-addclick-":    
+       president_list.append(values["-president-"])
+       president_list.append(values["-dob-"])
+       data.append(president_list)
+       window['-TABLE-'].Update(values=data) # this will refresh the table
 
 window.close()
