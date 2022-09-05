@@ -30,7 +30,10 @@ data = [
 layout = [[sg.Text('President Name : '),sg.Input(key='-president-')],
           [sg.Text('Date of Birth  : '),sg.Input(key='-dob-')], 
           [sg.Checkbox('Update Table', default=False,enable_events=True, key='-update_table_checked-')],
-          [sg.Button('Add',key='-add_click-'),sg.Button('Update',disabled = True,key='-update_click-'), sg.Cancel(key='-cancel_click-')],
+          [sg.Button('Add',key='-add_click-'),
+           sg.Button('Update',disabled = True,key='-update_click-'),
+           sg.Button('Delete',key='-delete_click-'),
+           sg.Button('Quit',key='-quit_click-')],
           [sg.Table(data, headings=col_headings, 
            justification='left', 
            max_col_width=25,
@@ -41,6 +44,7 @@ layout = [[sg.Text('President Name : '),sg.Input(key='-president-')],
            alternating_row_color='lightblue',
            num_rows=min(len(data), 6),
            key='-TABLE-')],
+           [sg.Text('',text_color='red', key='-error-')],   # To show error message based on validation
            ]
 window = sg.Window("Title", layout, finalize=True)
 president_list=[]
@@ -51,24 +55,28 @@ while True:
     event, values = window.read()
     if event == sg.WINDOW_CLOSED:
         break
-    elif event == "-cancel_click-":
+    elif event == "-quit_click-":
         break
-    elif event == "-update_table_checked-":
+    elif event == "-update_table_checked-":       
         if values['-update_table_checked-'] == False:
            window['-update_click-'].Update(disabled = True)
+           window['-error-'].update(" "*50)              
         elif values['-update_table_checked-'] == True:    
-           window['-update_click-'].Update(disabled = False) 
+           if president_list[0] != values["-president-"] or \
+              president_list[1] != values["-dob-"]:           
+              window['-update_click-'].Update(disabled = False) 
+              window['-error-'].update(" "*50)   
+           else:
+              window['-error-'].update("Values same as in Table row - Nothing to update...")        
+              window['-update_table_checked-'].Update(value = False)
     elif event == "-TABLE-":   
         window['-update_click-'].Update(disabled = True)        
         window['-update_table_checked-'].Update(value = False)                
-        selected_row = values["-TABLE-"][0]
-        print(selected_row)
+        selected_row = values["-TABLE-"][0]           #  This returns the selected row number
         data_selected = [data[row] for row in values[event]] 
         president_list= data_selected[0]      
         window['-president-'].update(president_list[0])
-        window['-dob-'].update(president_list[1])        
-        #window.Element('-president-').update(president_list[0])
-        #window.Element('-dob-').update(president_list[1])        
+        window['-dob-'].update(president_list[1])             
     elif event == "-add_click-":  
        president_list = []   
        president_list.append(values["-president-"])
@@ -78,5 +86,10 @@ while True:
     elif event == "-update_click-":           
        data[selected_row][0] =  values["-president-"]
        data[selected_row][1] =  values["-dob-"]       
-       window['-TABLE-'].Update(values=data) # this will refresh the table      
+       window['-TABLE-'].Update(values=data) # this will refresh the table   
+    elif event == "-delete_click-": 
+       option = sg.PopupOKCancel("Do you want to Delete the Row ? ")
+       if option == 'OK': 
+          data.pop(selected_row)
+          window['-TABLE-'].Update(values=data) # this will refresh the table          
 window.close()
