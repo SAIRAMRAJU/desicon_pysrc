@@ -1,7 +1,6 @@
 import PySimpleGUI as sg
 
 #  CRUD example, showing how to Add entries to a Table
-#  Also updates to SQL Server Database 
 #  When the user selects a table row, show the values in the Top row 
 #  How to update Table when the user edits the values and clicks on the check box "Update Table "
 #  How to Refresh Table after adding or updating a record 
@@ -141,7 +140,6 @@ def main():
            data=update_click_event(window,values,data,selected_row_number)                
         elif event == "-delete_click-": 
            data=delete_click_event(window,values,data,selected_row_number)                            
-
 
     window.close()
 
